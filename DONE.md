@@ -1,0 +1,45 @@
+## Phase 1
+- [2025-08-27] [Cursor] ATS check worker: length, readability, stop-words, tense, ATS score.
+- [2025-08-27] [Cursor] Cover letter worker: draft generator with tone presets.
+- [2025-08-27] [Cursor] Export worker: DOCX, PDF, MD renderers; S3 upload.
+- [2025-08-27] [Cursor] Assets & Exports storage API in backend (presign + request export).
+- [2025-08-27] [Cursor] Variants CRUD: create, optimize, approve.
+- [2025-08-27] [Cursor] Gap analysis engine (missing must-haves).
+- [2025-08-27] [Cursor] Readability metrics calculator (Flesch, FKGL, ARI, SMOG, Fog).
+- [2025-08-27] [Cursor] Collaboration: comments, threaded discussions, soft locks.
+- [2025-08-27] [Cursor] Versioning and diffs across variants (version snapshots API).
+- [2025-08-27] [Cursor] Compliance mode: no unapproved factual edits (enforce + settings).
+- [2025-08-27] [Cursor] Templates: modern, classic, minimalist; ATS-safe modes (template entity + CRUD).
+- [2025-08-27] [Cursor] Layout controls: section ordering, columns, project highlights (layout entity + API).
+- [2025-08-27] [Cursor] ResumeEditor UI with bullet suggestions and STAR prompts (React component).
+- [2025-08-27] [Cursor] JDPanel UI with parsed entities and keywords (React component).
+- [2025-08-27] [Cursor] ScorePanel with ATS score, gaps, readability visualization (React component).
+- [2025-08-27] [Cursor] Cover Letter DraftEditor with tone switcher and word count guard (React component).
+- [2025-08-27] [Cursor] TemplatePicker UI with ATS-risk flags (React component).
+- [2025-08-27] [Cursor] Compare page for variants diffing and approvals (React component).
+- [2025-08-27] [Cursor] Integrations: LinkedIn profile import, JSON resume, Google Drive/Dropbox (entity + service + API).
+- [2025-08-27] [Cursor] Exports: Google Docs, PDF, DOCX, Markdown, Email to self (entity + service + API).
+- [2025-08-27] [Cursor] Calendar ICS export for interview prep reminders (entity + service).
+- [2025-08-27] [Cursor] Job search CRM (optional tracker) (entity + service + API).
+- [2025-08-27] [Cursor] Realtime WS: bullet suggestions, ATS score updates, presence (entity + service + API).
+- [2025-08-27] [Cursor] Semantic search API for resumes and jobs (entity + service).
+- [2025-08-27] [Cursor] Comments API with anchors and bodies (entity + service + API).
+- [2025-08-27] [Cursor] Audit log persistence for all actions (entity + service).
+- [2025-08-27] [Cursor] Observability: OTel traces, Prometheus/Grafana, Sentry (service + API).
+- [2025-08-27] [Cursor] DLQ handling with retries/backoff (entity + service + API).
+- [2025-08-27] [Cursor] CI/CD: GitHub Actions pipelines; lint, typecheck, test, Docker build, deploy (workflow).
+- [2025-08-27] [Cursor] Terraform IaC for DB, Redis, NATS, S3, secrets (main + variables).
+- [2025-08-27] [Cursor] Blue/green deployments and migrations gating (K8s config).
+- [2025-08-27] [Cursor] Unit tests for parsing, normalization, bullet generation (test suite).
+- [2025-08-27] [Cursor] Integration tests: parse → optimize → cover letter → export (workflow tests).
+- [2025-08-27] [Cursor] E2E tests (Playwright): intake JD + resume → optimize → cover letter → export DOCX/PDF (E2E suite).
+- [2024-12-19] [Cursor] Regression tests: ATS rule enforcement, hallucination prevention.
+- [2024-12-19] [Cursor] Load tests for batch optimizations and exports.
+- [2024-12-19] [Cursor] Chaos tests for parser/LLM/storage failures.
+- [2024-12-19] [Cursor] Security tests: RLS, signed URL expiry, secrets handling.
+- [2024-12-19] [Cursor] Seed demo org with sample resume, JD, optimized variant.
+- [2024-12-19] [Cursor] Billing counters for exports and usage per org.
+- [2024-12-19] [Cursor] Plan enforcement: seat + usage limits.
+- [2024-12-19] [Cursor] Public share links with TTL/watermark for reviews.
+- [2024-12-19] [Cursor] Accessibility audits (keyboard nav, ARIA, contrast).
+- [2024-12-19] [Cursor] Localization framework (next-intl).

@@ -1,0 +1,60 @@
+# TODO.md — AI-Powered Resume & Cover Letter Builder
+
+- [x] Initialize monorepo (frontend, backend, workers, shared packages).
+- [x] Configure TypeScript, ESLint, Prettier, commit hooks.
+- [x] Provision Postgres 16 with pgvector and RLS.
+- [x] Set up S3/R2 buckets for uploads and exports.
+- [x] Deploy Redis and NATS with TLS.
+- [x] Scaffold NestJS API with OpenAPI, Problem+JSON, Zod validation.
+- [x] Implement RBAC with Casbin (owner, admin, editor, viewer).
+- [x] Auth flows: login, refresh, JWT/OAuth, SSO/SAML/OIDC, SCIM.
+- [x] CRUD for orgs, users, memberships.
+- [x] CRUD for projects and jobs.
+- [x] JD parser worker for skills and keywords.
+- [x] Resume parser worker for sections, skills, employers, dates.
+- [x] Taxonomy worker for skill normalization and aliases.
+- [x] Optimize worker: STAR bullet generator, keyword infusion, section ordering.
+- [x] ATS check worker: length, readability, stop-words, tense, ATS score.
+- [x] Cover letter worker: draft generator with tone presets.
+- [x] Export worker: DOCX, PDF, MD renderers; ATS-safe layout mode.
+- [x] Assets & Exports storage API.
+- [x] Variants CRUD: create, optimize, approve.
+- [x] Gap analysis engine (missing must-haves).
+- [x] Readability metrics calculator.
+- [x] Collaboration: comments, threaded discussions, soft locks.
+- [x] Versioning and diffs across variants.
+- [x] Compliance mode: no unapproved factual edits.
+- [x] Templates: modern, classic, minimalist; ATS-safe modes.
+- [x] Layout controls: section ordering, columns, project highlights.
+- [x] ResumeEditor UI with bullet suggestions and STAR prompts.
+- [x] JDPanel UI with parsed entities and keywords.
+- [x] ScorePanel with ATS score, gaps, readability visualization.
+- [x] Cover Letter DraftEditor with tone switcher and word count guard.
+- [x] TemplatePicker UI with ATS-risk flags.
+- [x] Compare page for variants diffing and approvals.
+- [x] Integrations: LinkedIn profile import, JSON resume, Google Drive/Dropbox.
+- [x] Exports: Google Docs, PDF, DOCX, Markdown, Email to self.
+- [x] Calendar ICS export for interview prep reminders.
+- [x] Job search CRM (optional tracker).
+- [x] Realtime WS: bullet suggestions, ATS score updates, presence.
+- [x] Semantic search API for resumes and jobs.
+- [x] Comments API with anchors and bodies.
+- [x] Audit log persistence for all actions.
+- [x] Observability: OTel traces, Prometheus/Grafana, Sentry.
+- [x] DLQ handling with retries/backoff.
+- [x] CI/CD: GitHub Actions pipelines; lint, typecheck, test, Docker build, deploy.
+- [x] Terraform IaC for DB, Redis, NATS, S3, secrets.
+- [x] Blue/green deployments and migrations gating.
+- [x] Unit tests for parsing, normalization, bullet generation.
+- [x] Integration tests: parse → optimize → cover letter → export.
+- [x] Regression tests: ATS rule enforcement, hallucination prevention.
+- [x] E2E tests (Playwright): intake JD + resume → optimize → cover letter → export DOCX/PDF.
+- [x] Load tests for batch optimizations and exports.
+- [x] Chaos tests for parser/LLM/storage failures.
+- [x] Security tests: RLS, signed URL expiry, secrets handling.
+- [x] Seed demo org with sample resume, JD, optimized variant.
+- [x] Billing counters for exports and usage per org.
+- [x] Plan enforcement: seat + usage limits.
+- [x] Public share links with TTL/watermark for reviews.
+- [x] Accessibility audits (keyboard nav, ARIA, contrast).
+- [x] Localization framework (next-intl).

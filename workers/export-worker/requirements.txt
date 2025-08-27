@@ -1,0 +1,27 @@
+# Core
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic==2.5.0
+python-dotenv==1.0.0
+structlog==23.2.0
+
+# Renderers
+python-docx==1.1.0
+reportlab==4.0.7
+markdown==3.5.1
+
+# Storage
+boto3==1.34.19
+botocore==1.34.19
+
+# Utils
+aiofiles==23.2.1
+httpx==0.25.2
+
+# Dev
+pytest==7.4.3
+pytest-asyncio==0.21.1
+flake8==6.1.0
+black==23.11.0
+isort==5.12.0
+

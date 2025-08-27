@@ -1,0 +1,43 @@
+# JD Parser Worker Configuration
+
+# Database Configuration
+database:
+  url: postgresql://postgres:postgres@localhost:5432/resume_builder
+  ssl: false
+  connection_pool:
+    min: 1
+    max: 10
+    idle_timeout: 30000
+
+# Task Queue Configuration
+queue:
+  redis_url: redis://localhost:6379
+  nats_url: nats://localhost:4222
+  max_concurrent_tasks: 4
+  task_timeout_seconds: 300
+
+# Application Configuration
+app:
+  port: 8000
+  environment: development
+  log_level: INFO
+
+# NLP Configuration
+nlp:
+  enable_advanced_features: true
+  spacy_model: en_core_web_sm
+  openai_enhancement: false
+  openai_api_key: ""
+
+# Data Management
+data:
+  cleanup_old_data_days: 90
+  store_skill_taxonomy: true
+
+# Feature Flags
+features:
+  extract_salary_ranges: true
+  extract_benefits: true
+  extract_responsibilities: true
+  extract_qualifications: true
+  categorize_skills: true

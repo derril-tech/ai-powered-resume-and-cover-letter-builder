@@ -1,0 +1,47 @@
+{
+    "name": "ai-powered-resume-builder",
+    "version": "0.1.0",
+    "private": true,
+    "workspaces": [
+        "apps/*",
+        "packages/*",
+        "workers/*"
+    ],
+    "scripts": {
+        "build": "turbo build",
+        "dev": "turbo dev",
+        "lint": "turbo lint",
+        "test": "turbo test",
+        "typecheck": "turbo typecheck",
+        "clean": "turbo clean",
+        "commit": "cz",
+        "init:s3": "node scripts/init-s3-buckets.js",
+        "generate-certs": "./scripts/generate-certs.sh"
+    },
+    "devDependencies": {
+        "turbo": "^1.10.0",
+        "husky": "^8.0.0",
+        "lint-staged": "^13.0.0",
+        "prettier": "^3.0.0",
+        "@typescript-eslint/eslint-plugin": "^6.0.0",
+        "@typescript-eslint/parser": "^6.0.0",
+        "eslint": "^8.0.0",
+        "eslint-config-prettier": "^9.0.0",
+        "eslint-plugin-prettier": "^5.0.0"
+    },
+    "lint-staged": {
+        "*.{ts,tsx,js,jsx}": [
+            "prettier --write",
+            "eslint --fix"
+        ],
+        "*.{json,md,yml,yaml}": [
+            "prettier --write"
+        ]
+    },
+    "config": {
+        "commitizen": {
+            "path": "cz-conventional-changelog"
+        }
+    },
+    "packageManager": "pnpm@8.0.0"
+}

@@ -1,0 +1,265 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resume-builder-backend
+  namespace: resume-builder
+  labels:
+    app: resume-builder-backend
+    version: v1
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: resume-builder-backend
+  template:
+    metadata:
+      labels:
+        app: resume-builder-backend
+        version: v1
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: resume-builder-backend-sa
+      containers:
+      - name: backend
+        image: resume-builder/backend:latest
+        ports:
+        - containerPort: 3000
+          name: http
+        - containerPort: 3001
+          name: health
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3000"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: resume-builder-secrets
+              key: database_url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: resume-builder-secrets
+              key: redis_url
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: resume-builder-secrets
+              key: jwt_secret
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: resume-builder-secrets
+              key: openai_api_key
+        - name: AWS_REGION
+          value: "us-east-1"
+        - name: S3_BUCKET_UPLOADS
+          value: "resume-builder-uploads-production"
+        - name: S3_BUCKET_EXPORTS
+          value: "resume-builder-exports-production"
+        - name: NATS_URL
+          value: "nats://resume-builder-nats:4222"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 3001
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      imagePullSecrets:
+      - name: docker-registry-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: resume-builder-backend
+  namespace: resume-builder
+  labels:
+    app: resume-builder-backend
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+    name: http
+  - port: 3001
+    targetPort: 3001
+    protocol: TCP
+    name: health
+  selector:
+    app: resume-builder-backend
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: resume-builder-backend-ingress
+  namespace: resume-builder
+  annotations:
+    kubernetes.io/ingress.class: "alb"
+    alb.ingress.kubernetes.io/scheme: "internet-facing"
+    alb.ingress.kubernetes.io/target-type: "ip"
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:us-east-1:123456789012:certificate/example"
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/healthcheck-path: "/health"
+    alb.ingress.kubernetes.io/healthcheck-port: "3001"
+    alb.ingress.kubernetes.io/healthcheck-protocol: "HTTP"
+    alb.ingress.kubernetes.io/success-codes: "200"
+    alb.ingress.kubernetes.io/healthy-threshold-count: "2"
+    alb.ingress.kubernetes.io/unhealthy-threshold-count: "2"
+    alb.ingress.kubernetes.io/timeout-seconds: "5"
+    alb.ingress.kubernetes.io/interval-seconds: "30"
+spec:
+  rules:
+  - host: api.resumebuilder.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: resume-builder-backend
+            port:
+              number: 80
+---
+# Blue/Green Deployment Configuration
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: resume-builder-backend-rollout
+  namespace: resume-builder
+spec:
+  replicas: 3
+  strategy:
+    blueGreen:
+      activeService: resume-builder-backend-active
+      previewService: resume-builder-backend-preview
+      autoPromotionEnabled: false
+      scaleDownDelaySeconds: 30
+      prePromotionAnalysis:
+        templates:
+        - templateName: success-rate
+        args:
+        - name: service-name
+          value: resume-builder-backend-preview
+      postPromotionAnalysis:
+        templates:
+        - templateName: success-rate
+        args:
+        - name: service-name
+          value: resume-builder-backend-active
+  selector:
+    matchLabels:
+      app: resume-builder-backend
+  template:
+    metadata:
+      labels:
+        app: resume-builder-backend
+    spec:
+      containers:
+      - name: backend
+        image: resume-builder/backend:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3000"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: resume-builder-secrets
+              key: database_url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: resume-builder-secrets
+              key: redis_url
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: resume-builder-secrets
+              key: jwt_secret
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: resume-builder-secrets
+              key: openai_api_key
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: resume-builder-backend-active
+  namespace: resume-builder
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 3000
+  selector:
+    app: resume-builder-backend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: resume-builder-backend-preview
+  namespace: resume-builder
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 3000
+  selector:
+    app: resume-builder-backend

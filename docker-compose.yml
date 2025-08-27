@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ai-resume-builder-postgres
+    environment:
+      POSTGRES_DB: resume_builder
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - resume-builder
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    container_name: ai-resume-builder-redis
+    ports:
+      - "6379:6379"
+      - "6380:6380" # TLS port
+    volumes:
+      - redis_data:/data
+      - ./docker/certs:/etc/ssl/certs:ro
+      - ./docker/redis/redis.conf:/etc/redis/redis.conf:ro
+    networks:
+      - resume-builder
+    command: [ "redis-server", "/etc/redis/redis.conf" ]
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--tls", "--cacert", "/etc/ssl/certs/ca.crt", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - REDIS_PASSWORD=redis_password_for_development
+
+  nats:
+    image: nats:2.10-alpine
+    container_name: ai-resume-builder-nats
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+      - "4443:4443" # TLS port
+    volumes:
+      - nats_data:/data
+      - ./docker/certs:/etc/ssl/certs:ro
+    networks:
+      - resume-builder
+    command: [ "nats-server", "--jetstream", "--store_dir", "/data", "--tls", "--tlscert", "/etc/ssl/certs/server.crt", "--tlskey", "/etc/ssl/certs/server.key", "--tls-ca", "/etc/ssl/certs/ca.crt" ]
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "https://localhost:4443/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  minio:
+    image: minio/minio:latest
+    container_name: ai-resume-builder-minio
+    environment:
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - resume-builder
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+volumes:
+  postgres_data:
+  redis_data:
+  nats_data:
+  minio_data:
+
+
+networks:
+  resume-builder:
+    driver: bridge
